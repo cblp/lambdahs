@@ -129,11 +129,11 @@ main = do
             putStr("\t= "); print(eval(exp))
             putStr("\t= "); print(eval(exp) == true)
 
-    -- Expr y = Lam{
-    --     "f",
-    --     App{
-    --         Lam{"x", App{"f", App{"x", "x"}}},
-    --         Lam{"x", App{"f", App{"x", "x"}}},
-    --     }
-    -- };
-    -- print(y);
+    let y = Lam("f",
+                App(
+                    Lam("x", App("f", App("x", "x"))),
+                    Lam("x", App("f", App("x", "x")))
+                )
+            )
+    putStr("y = "); print(y)
+    -- putStr("y = "); print(eval(y))
