@@ -202,8 +202,11 @@
 
 И после этого пробуем применить все правила ещё раз.
 
+Операция подстановки реализована ниже.
+
 Если правило не удаётся применить на верхнем уровне,
-применяем к отдельным подвыражениям:
+применяем к отдельным подвыражениям.
+Не повторяем правила, если мы не сдвинулись с места.
 
 >     App(fun, arg) -> do
 >         let fun1 = eval(fun)
@@ -217,10 +220,20 @@
 это правильнее было бы назвать упрощением выражения,
 но его удобно реализовать прямо здесь.
 
->     Lam(var1, App(fun, Var(var2))) ->
->         if var1 == var2 && not(contains(fun, var1)) then eval(fun) else exp
+Суть этого упрощения в сокращении взаимных абстракции и аппликации:
 
-Это тоже применение в глубину, но уже для лямбда-абстракции:
+      λ x . f x  -->  f
+
+Это можно делать, только если "f" не содержит "x".
+
+>     Lam(var1, App(fun, Var(var2))) ->
+>         if var1 == var2 && not(contains(fun, var1)) then
+>             eval(fun)
+>         else
+>             exp
+
+Это тоже применение в глубину, но уже для лямбда-абстракции.
+Не повторяем правила, если мы не сдвинулись с места.
 
 >     Lam(var, body) -> do
 >         let body1 = eval(body)
@@ -233,20 +246,41 @@
 
 >     _ -> exp
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Вспомогательные функции
+=======================
+
+Подстановка в выражении `exp` переменной `var` на новое выражение `target`.
 
 > replace(exp, var, target) = case exp of
->     Var(var2)       -> if var2 == var then target else exp
->     App(fun, arg)   -> App(replace(fun, var, target), replace(arg, var, target))
->     Lam(var2, body) ->
->         if var2 == var then exp else Lam(var2, replace(body, var, target))
+
+Встретилась искомая переменная:
+
+>     Var(var2) -> if var2 == var then
+>                      target
+>                  else
+>                      exp
+
+Если лямбда-абстракция вводит переменную с таким же именем,
+то это уже совсем другая переменная, мы её не трогаем.
+
+>     Lam(var2, body) -> if var2 == var then
+>                            exp
+>                        else
+>                            Lam(var2, replace(body, var, target))
+
+>     App(fun, arg) -> App(replace(fun, var, target), replace(arg, var, target))
+
+Проверка вхождения переменной в выражение:
 
 > contains(exp, var) = case exp of
 >     Var(var1)       -> var1 == var
 >     App(exp1, exp2) -> contains(exp1, var) || contains(exp2, var)
 >     Lam(var1, body) -> var1 /= var && contains(body, var)
 
-> -- Test ------------------------------------------------------------------------
+
+Проверка нашей реализации
+=========================
 
 > main = do
 >     print("x" :: Exp)
