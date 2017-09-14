@@ -3,15 +3,15 @@ import Data.String
 
 -- Definition ------------------------------------------------------------------
 
-type VarName = String
+type Name = String
 
-data Exp = Var(VarName) | App(Exp, Exp) | Lam(VarName, Exp)
+data Exp = Var(Name) | App(Exp, Exp) | Lam(Name, Exp)
     deriving Eq
 
 -- Syntax sugar ----------------------------------------------------------------
 
 instance IsString(Exp) where
-    fromString(varname) = Var(varname)
+    fromString(name) = Var(name)
 
 app(exps) = case exps of
     []            -> error("empty list cannot be an expression")
@@ -33,7 +33,7 @@ multiLam(first, rest, body) = case rest of
 
 instance Show(Exp) where
     show(exp) = case exp of
-        Var(varname)    -> varname
+        Var(name)       -> name
         App(fun, arg)   -> "(" ++ show(fun) ++ " " ++ show(arg) ++ ")"
         Lam(var, body)  -> "(λ " ++ var ++ " . " ++ show(body) ++ ")"
 
