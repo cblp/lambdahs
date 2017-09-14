@@ -5,7 +5,7 @@ tests:
     default-extensions:
       - OverloadedStrings
       - TypeFamilies
-    main: Main.hs
+    main: Main.lhs
 
 dependencies:
   - base
