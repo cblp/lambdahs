@@ -1,0 +1,12 @@
+name: lambdahs
+
+tests:
+  test:
+    default-extensions:
+      - OverloadedLists
+      - OverloadedStrings
+      - TypeFamilies
+    main: Main.hs
+
+dependencies:
+  - base
