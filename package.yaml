@@ -1,5 +1,11 @@
 name: lambdahs
 
+executables:
+  zebra:
+    default-extensions:
+      - TypeApplications
+    main: Zebra.hs
+
 tests:
   test:
     default-extensions:
