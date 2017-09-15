@@ -1,6 +1,10 @@
 name: lambdahs
 
 executables:
+
+  derive:
+    main: Derive.hs
+
   zebra:
     default-extensions:
       - TypeApplications
