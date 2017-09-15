@@ -254,8 +254,8 @@
 Да! Этих правил достаточно, чтобы вычислять что угодно!
 
 
-Вспомогательные функции
-=======================
+Подстановка значения переменной
+===============================
 
 Подстановка, то есть замена в выражении `exp`
 переменной `var` на новое выражение `target`.
@@ -264,22 +264,44 @@
 
 Встретилась искомая переменная:
 
->     Var(var2) -> if var2 == var then
->                      target
->                  else
->                      exp
+>     Var(var2) ->
+>         if var2 == var then
+>             target
+>         else
+>             exp
 
 Если лямбда-абстракция вводит переменную с таким же именем,
 то это уже совсем другая переменная, мы её не трогаем.
 
->     Lam(var2, body) -> if var2 == var then
->                            exp
->                        else
->                            Lam(var2, replace(body, var, target))
+>     Lam(var2, body) ->
+>         if var2 == var then
+>             exp
+>         else
+>             Lam(var2, replace(body, var, rename(target, var2)))
 
->     App(fun, arg) -> App(replace(fun, var, target), replace(arg, var, target))
+>     App(fun, arg) ->
+>         App(replace(fun, var, target), replace(arg, var, target))
 
-Проверка вхождения переменной в выражение:
+
+Переименование переменной
+=========================
+
+> rename(exp, var) =
+>     if contains(exp, var) then
+>         renameN(exp, var, 0)
+>     else
+>         exp
+
+> renameN(exp, var, n) = do
+>     let newVar = var ++ show n
+>     if contains(exp, newVar) then
+>         renameN(exp, var, n + 1)
+>     else
+>         replace(exp, var, Var(newVar))
+
+
+Проверка вхождения переменной в выражение
+=========================================
 
 > contains(exp, var) = case exp of
 >     Var(var1)       -> var1 == var
@@ -355,3 +377,7 @@
 >             )
 >     putStr("y = "); print(y)
 >     -- putStr("y = "); print(eval(y))
+
+>     let test5 = app[true, "y"]
+>     putStr("test5 = "); print(test5)
+>     putStr("      = "); print(eval(test5))
